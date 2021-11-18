@@ -1,0 +1,43 @@
+src/index.js khai báo express app
+
+package.json:
+chứa các lệnh chạy scripts, dependencies,chi tiết tên,version npm được sử dụng
+
+.gitignore liệt kê các mục không cần push lên remote
+
+models:
+chứa các file định nghĩa các schema, thao tác trực tiếp với DB
+
+controllers: chứa các chức năng để viết api,tương tác vs models để lấy data từ DB, tạo api gửi về cho client
+
+middleware: 
+chứa các phần trung gian(ex:login,xac thuc authentication,phan quyen authorization...), ví như các ông bảo vệ canh cổng
+kiểm soát giữa các thành phần 
+data qua middleware có thể bị thay đổi
+
+function (res,req,next):  middleware
+{ //co the kiem soat req,res, 
+next: chuyen sang middleware ke tiep hoac controllers}
+khong co res.send() hoac next() trong middleware se lam ud treo
+
+routes: 
+định hướng  tới các middleware phù hợp để thực hiện req
+ex : router.post(path,[middleware1,middleware2....,controllers])
+
+configs:
+ dung de cau hinh cho cac api ben thu 3 
+
+utils:
+chứa các chức năng cần thiết , được sử dụng nhiều
+
+public: chứa img,js,stylesheets
+
+views: chứa các file tương ứng với template engine su dung :pug, ejs,handlebar...
+Sử dụng cho MPA
+giao diện được lấy từ views , nội dung hiện thị được lấy thông qua tương tác với model
+
+
+
+
+
+
