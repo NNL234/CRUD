@@ -1,0 +1,61 @@
+---------------------------------------JWT JSON Web Token ----------------------------------------------
+
+method cho phép decode encode 
+
+gồm có 3 phần phân cách bởi dấu . :header.payload.signature
+header chưa thuật toán tạo ra mã hóa chuối jwt,thông tin bổ sung
+payload chứa data gom vào
+2 phần này public,không lưu pasword vào jwt,jwt chỉ chứa các thông tin không quá nhạy cảm
+signature xác minh xem chuối jwt này có phải do server tạo ra không
+data +secret =jwt.sign()=> token
+token +secret <=jwt.verify()= data
+data (có chứa iat để xem token đã hết hạn chưa)
+
+install jsonwebtoken
+
+token = jwt.sign({data},secret)//hàm đồng bộ(muốn bắt lỗi cho vào try catch) tạo token
+
+jwt.verify(token,secret)
+
+gán exprire cho token
+jwt.sign(data,secret,{exprireIn :30})
+
+sign có callback là hàm async,có thể set expiresIn 
+nên để 15p/1 tiếng
+
+bản thân token có hạn sống riêng ,không thể can thiệp để hủy nó được , chỉ chờ nó hết hạn thôi
+
+
+----------------------------------------------------------------------------------------------------------
+
+Ứng dụng trong login 
+user lần đầu đăng nhập => username,password  gửi lên nhờ gọi ajax đến /login trên server và method post
+
+trên server sẽ nhận được req có chứa username,password lưu trong req.body=>so sánh trong db
+-Nếu khớp (có username,password,có thể lấy đc _id(cái này lưu trong db,khác với password))thì thông báo thành công và
+jwt.sign(data(có thể chứa _id),secret)=>token 
+
+server gửi về cho client(res.json({message(thông báo thành công),token})
+ 
+ 
+ajax gửi lên server
+function login(){
+$ajax({
+url : '/login/,
+type : 'POST',
+data: {
+     username : $('#username').val(),
+     password : $('#password').val()
+     }
+}).then(data=>{})
+.catch (err=>{})
+}
+ 
+ khi login xong cần phải lưu token bên phía client(vd cookie,header...)
+ nếu lưu trong cookie, khi gửi req bất kì lên server thì nó được chuyển cùng, đi lên server(dùng cookie-parser
+ để đọc thông tin chứa trong cookie), access : req.cookie.token
+ 
+Để access với các page private(yêu cầu ít nhất phải là user của web đó) cần phải login khi truy cập vào page private, server sẽ dựa vào token 
+do client gửi lên và secret(của server) đó để xác định xem token có hợp lệ không(verify(token,secret) để trong try catch)
+
+trong token decode chứa role để làm chức năng phân quyền
