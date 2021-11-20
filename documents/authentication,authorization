@@ -59,3 +59,4 @@ data: {
 do client gửi lên và secret(của server) đó để xác định xem token có hợp lệ không(verify(token,secret) để trong try catch)
 
 trong token decode chứa role để làm chức năng phân quyền
+use nodeacl để phân quyền nhiều cấp
