@@ -1,3 +1,9 @@
 {
-    "jwtPrivateKey": "unsecureKey"
+    "jwtPrivateKey": "unsecureKey",
+    "neo4j":{
+        "url": "bolt://localhost:7687",
+        "username" :"neo4j",
+        "password" : "admin123456",
+        "database" : "neo4j"
+    }
 }
