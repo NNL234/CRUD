@@ -1,9 +1,7 @@
 const express = require('express');
 const config = require('config');
-const jwt =require('jsonwebtoken');
 const neo4j = require('neo4j-driver');
 const neo4jdb = config.get("neo4j")
-const driver = neo4j.driver(neo4jdb.url,neo4j.auth.basic(neo4jdb.username,neo4jdb.password));
 const app = express();
 const routes = require('./routes');
 const neo4jSessionCleanup = require('./middleware/neo4jSessionCleanup');

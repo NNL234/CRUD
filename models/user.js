@@ -1,13 +1,10 @@
-const neo4j = require('neo4j-driver')
 const {role} = require('../middleware/role')
-const driver = neo4j.driver("bolt://localhost:7687",neo4j.auth.basic("neo4j","admin123456"));
-// tat ca cac node co label ma user co the lay duoc thong tin ma cac node do co the lay dc
-//vd user(Ha Noi ) co the xem duoc thong tin cua user(cac quan huyen xa thon thuoc Ha Noi)
+// tim cac node co label user do user quan ly
 const findAll = function(session,user) {
-     let query = `MATCH(user:User)
-                WHERE user.username =~ "${user.username + ".*"}"
-                 RETURN user`
-      return session.readTransaction(transaction=> transaction.run(query))   
+     let query = `MATCH(user:User{username:$username})-[:QUANLY]-> (u:User)
+                    RETURN u`
+     return session.readTransaction(transaction=> transaction.run(query,{username:user.username}))   
+     // WHERE user.username =~ "${user.username + ".*"}"
 }
 //ex query
 //   `MATCH (c:Company) 
@@ -20,6 +17,10 @@ const findAll = function(session,user) {
 // .then(res=>console.log(res.records.length))
 // .catch(err=>console.log(err))
 //tim 1 user
+
+//?? tim theo ten tinh thanh pho hoac ma tinh/tp luc tao tk de xem  ten/ma tinh/tp do da dc tao/dc dung chua
+//?? Tim theo ten tinh/tp
+//?? tim theo ma tinh/tp
 const find = function(session,user) {
      let query = `MATCH(user:User{username:$username})
                  RETURN user`
@@ -30,7 +31,7 @@ const find = function(session,user) {
 const add = function(session,manageUser,user) {
     let query =`MATCH (manageUser:${role(manageUser.roleId)}{name :$manageUser}) 
                 CREATE (manageUser)-[:QUANLY]->
-                (user:User:${user.role}{name:$name,username:$username,password:$password,active:true,role:$role})
+                (user:User:${role(manageUser.roleId +1)}{name:$name,username:$username,password:$password,active:true,role:$role,completed :false})
                 RETURN user `
     return session.writeTransaction(ss => ss.run(query,
     {   manageUser :manageUser.name,
@@ -50,21 +51,21 @@ const remove = function(session,user) {
 }
 
 //update quyen khai bao neu 1 node user active = false thi cac node user bi quan li phia duoi active = false
-const update = function(session,user) {
+const changePermission = function(session,user,isActive) {
     let query = `MATCH (user:User)
                  WHERE user.username =~ "${user.username + ".*"}"
-                 SET user.active = true
+                 SET user.active = ${isActive}
                  return user`
     return session.writeTransaction(transaction=>transaction.run(query))
 }
 
 const changePassword = function(session,user) {
     let query = `MATCH (user:User)
-                WHERE user.username = $username
+                WHERE user.username = $username AND user.password =$password
                 SET user.password = $newPassword
                 return user`
     return session.writeTransaction(transaction=> 
-        transaction.run(query,{username:user.username,newPassword:user.newPassword}))
+        transaction.run(query,{username:user.username,newPassword:user.newPassword,password:user.password}))
 }
 // update(driver.session(),{username :"00"})
 // .then(re=>console.log( re))
@@ -99,7 +100,7 @@ module.exports={
     find : find,
     findAll:findAll,
     add:add,
-    update:update,
+    changePermission:changePermission,
     remove:remove,
     changePassword:changePassword,
 }
